@@ -22,71 +22,101 @@ export function TicketView({
   const isPaid = order.status === "paid";
 
   return (
-    <div className="max-w-md mx-auto px-6 py-10">
-      <div className="border border-neutral-200 rounded-lg overflow-hidden bg-white shadow-sm">
-        <div
-          className={`px-6 py-10 text-center border-b border-neutral-200 ${
-            isPaid ? "bg-emerald-50/60" : "bg-amber-50/40"
+    <div className="max-w-lg mx-auto px-6 py-12">
+      <div className="text-center mb-8">
+        <span
+          className={`inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] font-medium px-3 py-1 rounded-full ${
+            isPaid
+              ? "text-emerald-700 bg-emerald-50 ring-1 ring-emerald-200"
+              : "text-amber-700 bg-amber-50 ring-1 ring-amber-200"
           }`}
         >
-          <p className="text-[11px] uppercase tracking-[0.18em] text-neutral-500 font-medium">
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              isPaid ? "bg-emerald-500" : "bg-amber-500"
+            }`}
+          />
+          {isPaid ? "Payment received" : "Awaiting payment"}
+        </span>
+        <h1 className="font-serif text-5xl tracking-tight text-stone-900 mt-4 leading-tight">
+          {isPaid ? (
+            <>You&apos;re <span className="italic text-emerald-700">all set.</span></>
+          ) : (
+            <>Almost <span className="italic text-orange-700">there.</span></>
+          )}
+        </h1>
+        <p className="text-sm text-stone-500 mt-3">
+          {isPaid
+            ? "Show the code below at the kitchen for pickup."
+            : "Complete payment on your phone — this page will update."}
+        </p>
+      </div>
+
+      <div className="bg-white rounded-xl border border-stone-200/80 overflow-hidden shadow-sm">
+        <div
+          className={`px-6 py-12 text-center border-b border-dashed border-stone-200 ${
+            isPaid
+              ? "bg-gradient-to-b from-emerald-50/60 to-white"
+              : "bg-gradient-to-b from-orange-50/60 to-white"
+          }`}
+        >
+          <p
+            className={`text-[11px] uppercase tracking-[0.2em] font-semibold ${
+              isPaid ? "text-emerald-700" : "text-orange-700"
+            }`}
+          >
             Pickup code
           </p>
-          <p
-            className={`font-mono text-5xl font-semibold tracking-[0.2em] mt-3 ${
-              isPaid ? "text-emerald-800" : "text-neutral-900"
-            }`}
-          >
+          <p className="font-serif text-8xl font-normal tracking-[0.15em] mt-3 text-stone-900">
             {order.code}
           </p>
-          <div
-            className={`mt-6 inline-flex items-center gap-2 text-xs font-medium rounded-full px-3 py-1 ${
-              isPaid
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : "bg-amber-50 text-amber-700 border border-amber-200"
-            }`}
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                isPaid ? "bg-green-600" : "bg-amber-500"
-              }`}
-            />
-            {isPaid ? "Paid" : "Waiting for payment"}
-          </div>
         </div>
 
         <div className="px-6 py-5">
-          <h3 className="text-xs uppercase tracking-wider font-medium text-neutral-500 mb-3">
-            Items
-          </h3>
-          <ul className="space-y-2 text-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[11px] uppercase tracking-[0.18em] font-semibold text-orange-700">
+              Order
+            </h3>
+            <span className="text-[11px] uppercase tracking-wider text-stone-400">
+              {items.length} {items.length === 1 ? "dish" : "dishes"}
+            </span>
+          </div>
+          <ul className="divide-y divide-stone-100">
             {items.map((i, idx) => (
-              <li key={idx} className="flex justify-between">
-                <span className="text-neutral-700">
-                  <span className="text-neutral-900 font-medium">{i.qty}×</span>{" "}
-                  {i.name}
+              <li
+                key={idx}
+                className="py-2.5 flex items-baseline gap-3 text-sm"
+              >
+                <span className="text-orange-700 font-semibold tabular-nums shrink-0 w-6">
+                  {i.qty}×
                 </span>
-                <span className="tabular-nums text-neutral-900">
-                  NLe {((i.price_cents * i.qty) / 100).toFixed(2)}
+                <span className="flex-1 text-stone-800">{i.name}</span>
+                <span className="tabular-nums text-stone-900 shrink-0">
+                  {((i.price_cents * i.qty) / 100).toFixed(2)}
                 </span>
               </li>
             ))}
           </ul>
-          <div className="mt-4 pt-3 border-t border-neutral-200 flex justify-between text-sm">
-            <span className="font-medium">Total</span>
-            <span className="font-semibold tabular-nums">
-              NLe {(order.total_cents / 100).toFixed(2)}
-            </span>
-          </div>
         </div>
 
-        <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 text-center">
-          <p className="text-xs text-neutral-600">
-            Show this code at the kitchen counter.
-          </p>
-          <p className="text-[11px] text-neutral-400 mt-1">{order.phone}</p>
+        <div className="px-6 py-4 bg-gradient-to-b from-orange-50/40 to-orange-50/70 border-t border-stone-100 flex items-baseline justify-between">
+          <span className="text-sm text-stone-600">Total</span>
+          <span className="font-serif text-2xl tabular-nums text-stone-900">
+            <span className="text-xs text-orange-700 mr-1.5 font-semibold">NLe</span>
+            {(order.total_cents / 100).toFixed(2)}
+          </span>
         </div>
       </div>
+
+      <p className="text-[11px] text-stone-400 text-center mt-6 tabular-nums">
+        {order.phone} ·{" "}
+        {new Date(order.created_at).toLocaleString([], {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </p>
     </div>
   );
 }

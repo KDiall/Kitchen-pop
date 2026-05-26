@@ -15,15 +15,11 @@ export default async function Page() {
 
   if (!menu) {
     return (
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <div className="border border-neutral-200 rounded-lg p-12 text-center">
-          <h1 className="text-xl font-semibold text-neutral-900">
-            No menu today
-          </h1>
-          <p className="text-sm text-neutral-500 mt-2">
-            The kitchen hasn&apos;t published a menu yet. Check back soon.
-          </p>
-        </div>
+      <div className="max-w-2xl mx-auto px-6 py-24 text-center">
+        <h1 className="font-serif text-3xl text-zinc-900">No menu today</h1>
+        <p className="text-sm text-zinc-500 mt-3">
+          The kitchen hasn&apos;t published yet. Check back soon.
+        </p>
       </div>
     );
   }
@@ -43,23 +39,43 @@ export default async function Page() {
       hour: "2-digit",
       minute: "2-digit",
     });
+    const dateStr = new Date().toLocaleDateString(undefined, {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
 
     return (
-      <div className="max-w-5xl mx-auto px-6 py-10 grid md:grid-cols-[1fr_320px] gap-8">
+      <div className="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-[1fr_340px] gap-10">
         <section>
-          <div className="mb-8">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Open · closes {cutoffStr}
-            </span>
-            <h1 className="text-3xl font-semibold tracking-tight text-neutral-900 mt-3">
-              Today&apos;s menu
-            </h1>
-            <p className="text-sm text-neutral-500 mt-1.5">
-              Freshly cooked Sierra Leonean dishes. Pay by mobile money, pick up hot.
-            </p>
+          <div className="mb-10 pb-6 border-b border-stone-200/80 relative">
+            <div className="absolute -top-6 -left-10 w-48 h-48 bg-orange-200/30 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-4 left-40 w-40 h-40 bg-emerald-200/30 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[11px] uppercase tracking-[0.2em] text-orange-700 font-semibold">
+                  {dateStr}
+                </span>
+                <span className="h-px flex-1 bg-stone-200" />
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                  <span className="relative flex w-1.5 h-1.5">
+                    <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+                    <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  Open until {cutoffStr}
+                </span>
+              </div>
+              <h1 className="font-serif text-6xl tracking-tight text-stone-900 leading-[1.02]">
+                Today&apos;s{" "}
+                <span className="italic text-orange-700">menu</span>
+              </h1>
+              <p className="text-stone-600 mt-5 max-w-md leading-relaxed">
+                Freshly cooked Sierra Leonean classics. Order before cutoff, pay
+                by mobile money, pick up hot.
+              </p>
+            </div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-4">
             {items?.map((item) => (
               <MenuCard key={item.id} item={item} />
             ))}
@@ -71,15 +87,11 @@ export default async function Page() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
-      <div className="border border-neutral-200 rounded-lg p-12 text-center">
-        <h1 className="text-xl font-semibold text-neutral-900">
-          Closed for today
-        </h1>
-        <p className="text-sm text-neutral-500 mt-2">
-          New menu opens tomorrow morning.
-        </p>
-      </div>
+    <div className="max-w-2xl mx-auto px-6 py-24 text-center">
+      <h1 className="font-serif text-3xl text-zinc-900">Closed for today</h1>
+      <p className="text-sm text-zinc-500 mt-3">
+        New menu opens tomorrow morning.
+      </p>
     </div>
   );
 }

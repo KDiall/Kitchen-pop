@@ -38,62 +38,76 @@ export default async function AdminPage() {
     0
   );
 
+  const dateStr = new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Kitchen dashboard
+    <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="mb-10 pb-6 border-b border-stone-200/80">
+        <span className="text-[11px] uppercase tracking-[0.2em] text-orange-700 font-semibold">
+          {dateStr}
+        </span>
+        <h1 className="font-serif text-5xl tracking-tight text-stone-900 mt-2 leading-tight">
+          Kitchen <span className="italic text-orange-700">dashboard</span>
         </h1>
-        <p className="text-sm text-neutral-500 mt-1">
+        <p className="text-sm text-stone-500 mt-3">
           Live view of paid orders. Refresh to update.
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-10">
-        <div className="bg-white border border-neutral-200 rounded-lg p-4">
-          <p className="text-xs uppercase tracking-wider text-neutral-500">
+      <div className="grid grid-cols-3 gap-px bg-stone-200/70 rounded-xl overflow-hidden border border-stone-200/70 mb-12 shadow-sm">
+        <div className="bg-white p-5">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-sky-700 font-semibold">
             Orders
           </p>
-          <p className="text-2xl font-semibold mt-1 tabular-nums">
+          <p className="font-serif text-5xl mt-1.5 tabular-nums text-stone-900">
             {(orders ?? []).length}
           </p>
         </div>
-        <div className="bg-white border border-neutral-200 rounded-lg p-4">
-          <p className="text-xs uppercase tracking-wider text-neutral-500">
+        <div className="bg-white p-5">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-amber-700 font-semibold">
             Items
           </p>
-          <p className="text-2xl font-semibold mt-1 tabular-nums">
+          <p className="font-serif text-5xl mt-1.5 tabular-nums text-stone-900">
             {totalItems}
           </p>
         </div>
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-          <p className="text-xs uppercase tracking-wider text-emerald-700">
+        <div className="bg-gradient-to-br from-emerald-50/60 to-white p-5">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-700 font-semibold">
             Revenue
           </p>
-          <p className="text-2xl font-semibold mt-1 tabular-nums text-emerald-900">
-            <span className="text-sm text-emerald-600 font-normal">NLe </span>
+          <p className="font-serif text-5xl mt-1.5 tabular-nums text-stone-900">
+            <span className="text-sm text-emerald-700 mr-1.5 font-semibold align-baseline">
+              NLe
+            </span>
             {(totalRevenue / 100).toFixed(0)}
           </p>
         </div>
       </div>
 
-      <section className="mb-10">
-        <h2 className="text-sm font-semibold text-neutral-900 mb-3">
-          Prep list
-        </h2>
+      <section className="mb-12">
+        <div className="flex items-baseline justify-between mb-4">
+          <h2 className="font-serif text-2xl text-stone-900">Prep list</h2>
+          <span className="text-[11px] uppercase tracking-[0.15em] text-stone-400">
+            By dish
+          </span>
+        </div>
         {prepList.length === 0 ? (
-          <div className="border border-neutral-200 rounded-lg p-8 text-center text-sm text-neutral-500">
+          <div className="border border-stone-200/80 rounded-xl p-10 text-center text-sm text-stone-500 bg-white">
             No paid orders yet.
           </div>
         ) : (
-          <ul className="bg-white border border-neutral-200 rounded-lg divide-y divide-neutral-200 overflow-hidden">
+          <ul className="bg-white border border-stone-200/80 rounded-xl divide-y divide-stone-100 overflow-hidden shadow-sm">
             {prepList.map(([name, qty]) => (
               <li
                 key={name}
-                className="flex justify-between items-center px-4 py-3 hover:bg-emerald-50/40 transition-colors"
+                className="flex items-center px-5 py-3.5 hover:bg-orange-50/40 transition-colors gap-4"
               >
-                <span className="text-sm text-neutral-900">{name}</span>
-                <span className="tabular-nums text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                <span className="text-sm text-stone-900 flex-1">{name}</span>
+                <span className="tabular-nums text-xs font-semibold text-orange-700 bg-orange-50 ring-1 ring-orange-200 px-2 py-0.5 rounded-full">
                   ×{qty}
                 </span>
               </li>
@@ -103,28 +117,32 @@ export default async function AdminPage() {
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold text-neutral-900 mb-3">
-          Paid orders
-        </h2>
+        <div className="flex items-baseline justify-between mb-4">
+          <h2 className="font-serif text-2xl text-stone-900">Paid orders</h2>
+          <span className="text-[11px] uppercase tracking-[0.15em] text-stone-400">
+            Most recent first
+          </span>
+        </div>
         {(orders ?? []).length === 0 ? (
-          <div className="border border-neutral-200 rounded-lg p-8 text-center text-sm text-neutral-500">
+          <div className="border border-stone-200/80 rounded-xl p-10 text-center text-sm text-stone-500 bg-white">
             Nothing yet.
           </div>
         ) : (
-          <ul className="bg-white border border-neutral-200 rounded-lg divide-y divide-neutral-200 overflow-hidden">
+          <ul className="bg-white border border-stone-200/80 rounded-xl divide-y divide-stone-100 overflow-hidden shadow-sm">
             {(orders ?? []).map((o) => (
               <li
                 key={o.id}
-                className="flex justify-between items-center px-4 py-3 hover:bg-emerald-50/40 transition-colors"
+                className="grid grid-cols-[auto_1fr_auto] items-center gap-4 px-5 py-3.5 hover:bg-emerald-50/40 transition-colors"
               >
-                <div className="flex items-center gap-4">
-                  <span className="font-mono font-semibold text-sm tracking-wider text-emerald-700">
-                    {o.code}
-                  </span>
-                  <span className="text-neutral-500 text-xs">{o.phone}</span>
-                </div>
-                <span className="tabular-nums text-sm font-medium">
-                  NLe {(o.total_cents / 100).toFixed(2)}
+                <span className="font-serif text-xl tracking-[0.1em] text-emerald-700">
+                  {o.code}
+                </span>
+                <span className="text-stone-500 text-xs tabular-nums">
+                  {o.phone}
+                </span>
+                <span className="tabular-nums text-sm font-medium text-stone-900">
+                  <span className="text-xs text-emerald-700 mr-1 font-semibold">NLe</span>
+                  {(o.total_cents / 100).toFixed(2)}
                 </span>
               </li>
             ))}

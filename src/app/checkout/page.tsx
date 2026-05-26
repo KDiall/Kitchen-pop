@@ -43,83 +43,96 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-md mx-auto px-6 py-16">
-        <div className="border border-neutral-200 rounded-lg p-10 text-center">
-          <h1 className="text-lg font-semibold text-neutral-900">
-            Your cart is empty
-          </h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            Add a few dishes first.
-          </p>
-          <button
-            onClick={() => router.push("/")}
-            className="mt-5 text-sm font-medium text-emerald-700 hover:text-emerald-800"
-          >
-            ← Back to menu
-          </button>
-        </div>
+      <div className="max-w-md mx-auto px-6 py-24 text-center">
+        <h1 className="font-serif text-4xl text-stone-900">
+          Your cart is <span className="italic text-orange-700">empty</span>
+        </h1>
+        <p className="text-sm text-stone-500 mt-3">
+          Browse the menu and add a few dishes first.
+        </p>
+        <button
+          onClick={() => router.push("/")}
+          className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-orange-700 underline underline-offset-4 decoration-orange-300 hover:decoration-orange-700 transition"
+        >
+          ← Back to menu
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto px-6 py-10">
+    <div className="max-w-lg mx-auto px-6 py-12">
       <button
         onClick={() => router.push("/")}
-        className="text-sm text-neutral-500 hover:text-emerald-700 mb-4 transition-colors"
+        className="text-xs uppercase tracking-[0.15em] text-stone-500 hover:text-orange-700 mb-6 transition-colors font-semibold"
       >
         ← Back to menu
       </button>
-      <h1 className="text-2xl font-semibold tracking-tight">Checkout</h1>
-      <p className="text-sm text-neutral-500 mt-1 mb-6">
-        Review your order and pay by mobile money.
+
+      <h1 className="font-serif text-5xl tracking-tight text-stone-900 leading-tight">
+        Review &amp; <span className="italic text-orange-700">pay</span>
+      </h1>
+      <p className="text-sm text-stone-500 mt-3">
+        Confirm your order and enter your mobile money number.
       </p>
 
-      <div className="border border-neutral-200 rounded-lg p-5">
-        <h2 className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-3">
-          Order summary
-        </h2>
-        <ul className="space-y-2 text-sm">
+      <div className="mt-8 bg-white rounded-xl border border-stone-200/80 overflow-hidden shadow-sm">
+        <div className="px-6 pt-5 pb-3 flex items-center justify-between border-b border-stone-100">
+          <h2 className="text-[11px] uppercase tracking-[0.18em] text-orange-700 font-semibold">
+            Order
+          </h2>
+          <span className="text-[11px] uppercase tracking-wider text-stone-400">
+            {items.length} {items.length === 1 ? "dish" : "dishes"}
+          </span>
+        </div>
+        <ul className="px-6 divide-y divide-stone-100">
           {items.map((i) => (
-            <li key={i.id} className="flex justify-between">
-              <span className="text-neutral-700">
-                <span className="text-neutral-900 font-medium">{i.qty}×</span>{" "}
-                {i.name}
+            <li
+              key={i.id}
+              className="py-3 flex items-baseline gap-3 text-sm"
+            >
+              <span className="text-orange-700 font-semibold tabular-nums shrink-0 w-6">
+                {i.qty}×
               </span>
-              <span className="tabular-nums text-neutral-900">
-                NLe {((i.price_cents * i.qty) / 100).toFixed(2)}
+              <span className="flex-1 text-stone-800">{i.name}</span>
+              <span className="tabular-nums text-stone-900 shrink-0">
+                {((i.price_cents * i.qty) / 100).toFixed(2)}
               </span>
             </li>
           ))}
         </ul>
-        <div className="flex justify-between border-t border-neutral-200 pt-3 mt-3 text-sm">
-          <span className="font-medium">Total</span>
-          <span className="font-semibold tabular-nums">
-            NLe {(total / 100).toFixed(2)}
+        <div className="px-6 py-4 bg-gradient-to-b from-orange-50/40 to-orange-50/70 border-t border-stone-100 flex items-baseline justify-between">
+          <span className="text-sm text-stone-600">Total</span>
+          <span className="font-serif text-3xl tabular-nums text-stone-900">
+            <span className="text-xs text-orange-700 mr-1.5 font-semibold align-baseline">
+              NLe
+            </span>
+            {(total / 100).toFixed(2)}
           </span>
         </div>
       </div>
 
-      <form
-        onSubmit={pay}
-        className="mt-4 border border-neutral-200 rounded-lg p-5 space-y-4"
-      >
-        <label className="block">
-          <span className="text-sm font-medium text-neutral-900">
+      <form onSubmit={pay} className="mt-6 space-y-5">
+        <div>
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-stone-900"
+          >
             Mobile money number
-          </span>
+          </label>
           <input
+            id="phone"
             type="tel"
             required
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+232 76 000 000"
-            className="mt-1.5 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all"
+            className="mt-2 w-full rounded-md border border-stone-300 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-600/15 transition-all"
           />
-          <span className="block mt-1.5 text-xs text-neutral-500">
-            We&apos;ll send the payment prompt here.
+          <span className="block mt-1.5 text-xs text-stone-500">
+            We&apos;ll send the payment prompt to this number.
           </span>
-        </label>
+        </div>
         {error && (
           <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
             {error}
@@ -128,12 +141,15 @@ export default function CheckoutPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-md py-2.5 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-orange-700 hover:bg-orange-800 text-white rounded-md py-3 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
         >
           {loading
             ? "Starting payment…"
             : `Pay NLe ${(total / 100).toFixed(2)}`}
         </button>
+        <p className="text-[11px] text-stone-400 text-center">
+          Secure mobile money via Monime
+        </p>
       </form>
     </div>
   );
