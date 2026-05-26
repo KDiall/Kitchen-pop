@@ -29,41 +29,108 @@ export default async function AdminPage() {
     (a, b) => b[1] - a[1]
   );
 
-  return (
-    <main className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Prep List</h1>
-      {prepList.length === 0 ? (
-        <p className="text-gray-500">No paid orders yet.</p>
-      ) : (
-        <ul className="bg-white rounded-xl border border-gray-100 divide-y">
-          {prepList.map(([name, qty]) => (
-            <li key={name} className="flex justify-between p-4">
-              <span className="font-medium">{name}</span>
-              <span className="font-mono">×{qty}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+  const totalRevenue = (orders ?? []).reduce(
+    (s, o) => s + o.total_cents,
+    0
+  );
+  const totalItems = Array.from(prepTotals.values()).reduce(
+    (s, n) => s + n,
+    0
+  );
 
-      <h2 className="text-xl font-semibold mt-10 mb-3">Paid Orders</h2>
-      {(orders ?? []).length === 0 ? (
-        <p className="text-gray-500 text-sm">Nothing yet.</p>
-      ) : (
-        <ul className="space-y-2">
-          {(orders ?? []).map((o) => (
-            <li
-              key={o.id}
-              className="bg-white rounded-lg border border-gray-100 p-3 flex justify-between text-sm"
-            >
-              <div>
-                <span className="font-mono font-semibold">{o.code}</span>
-                <span className="text-gray-500 ml-3">{o.phone}</span>
-              </div>
-              <span>NLe {(o.total_cents / 100).toFixed(2)}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+  return (
+    <div className="max-w-3xl mx-auto px-6 py-10">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Kitchen dashboard
+        </h1>
+        <p className="text-sm text-neutral-500 mt-1">
+          Live view of paid orders. Refresh to update.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-10">
+        <div className="bg-white border border-neutral-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wider text-neutral-500">
+            Orders
+          </p>
+          <p className="text-2xl font-semibold mt-1 tabular-nums">
+            {(orders ?? []).length}
+          </p>
+        </div>
+        <div className="bg-white border border-neutral-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wider text-neutral-500">
+            Items
+          </p>
+          <p className="text-2xl font-semibold mt-1 tabular-nums">
+            {totalItems}
+          </p>
+        </div>
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wider text-emerald-700">
+            Revenue
+          </p>
+          <p className="text-2xl font-semibold mt-1 tabular-nums text-emerald-900">
+            <span className="text-sm text-emerald-600 font-normal">NLe </span>
+            {(totalRevenue / 100).toFixed(0)}
+          </p>
+        </div>
+      </div>
+
+      <section className="mb-10">
+        <h2 className="text-sm font-semibold text-neutral-900 mb-3">
+          Prep list
+        </h2>
+        {prepList.length === 0 ? (
+          <div className="border border-neutral-200 rounded-lg p-8 text-center text-sm text-neutral-500">
+            No paid orders yet.
+          </div>
+        ) : (
+          <ul className="bg-white border border-neutral-200 rounded-lg divide-y divide-neutral-200 overflow-hidden">
+            {prepList.map(([name, qty]) => (
+              <li
+                key={name}
+                className="flex justify-between items-center px-4 py-3 hover:bg-emerald-50/40 transition-colors"
+              >
+                <span className="text-sm text-neutral-900">{name}</span>
+                <span className="tabular-nums text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                  ×{qty}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section>
+        <h2 className="text-sm font-semibold text-neutral-900 mb-3">
+          Paid orders
+        </h2>
+        {(orders ?? []).length === 0 ? (
+          <div className="border border-neutral-200 rounded-lg p-8 text-center text-sm text-neutral-500">
+            Nothing yet.
+          </div>
+        ) : (
+          <ul className="bg-white border border-neutral-200 rounded-lg divide-y divide-neutral-200 overflow-hidden">
+            {(orders ?? []).map((o) => (
+              <li
+                key={o.id}
+                className="flex justify-between items-center px-4 py-3 hover:bg-emerald-50/40 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <span className="font-mono font-semibold text-sm tracking-wider text-emerald-700">
+                    {o.code}
+                  </span>
+                  <span className="text-neutral-500 text-xs">{o.phone}</span>
+                </div>
+                <span className="tabular-nums text-sm font-medium">
+                  NLe {(o.total_cents / 100).toFixed(2)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
   );
 }

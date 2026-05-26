@@ -22,45 +22,71 @@ export function TicketView({
   const isPaid = order.status === "paid";
 
   return (
-    <main className="max-w-md mx-auto p-6">
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div className="text-center">
-          <p className="text-xs uppercase tracking-widest text-gray-500">
-            Pickup code
-          </p>
-          <p className="font-mono text-4xl font-bold tracking-widest mt-2">
-            {order.code}
-          </p>
-        </div>
+    <div className="max-w-md mx-auto px-6 py-10">
+      <div className="border border-neutral-200 rounded-lg overflow-hidden bg-white shadow-sm">
         <div
-          className={`mt-4 text-center text-sm rounded-lg py-2 ${
-            isPaid
-              ? "bg-green-50 text-green-700"
-              : "bg-amber-50 text-amber-700"
+          className={`px-6 py-10 text-center border-b border-neutral-200 ${
+            isPaid ? "bg-emerald-50/60" : "bg-amber-50/40"
           }`}
         >
-          {isPaid ? "Paid — see you at pickup" : "Waiting for payment…"}
+          <p className="text-[11px] uppercase tracking-[0.18em] text-neutral-500 font-medium">
+            Pickup code
+          </p>
+          <p
+            className={`font-mono text-5xl font-semibold tracking-[0.2em] mt-3 ${
+              isPaid ? "text-emerald-800" : "text-neutral-900"
+            }`}
+          >
+            {order.code}
+          </p>
+          <div
+            className={`mt-6 inline-flex items-center gap-2 text-xs font-medium rounded-full px-3 py-1 ${
+              isPaid
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-amber-50 text-amber-700 border border-amber-200"
+            }`}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                isPaid ? "bg-green-600" : "bg-amber-500"
+              }`}
+            />
+            {isPaid ? "Paid" : "Waiting for payment"}
+          </div>
         </div>
-        <ul className="mt-5 space-y-1 text-sm">
-          {items.map((i, idx) => (
-            <li key={idx} className="flex justify-between">
-              <span>
-                {i.qty}× {i.name}
-              </span>
-              <span>
-                NLe {((i.price_cents * i.qty) / 100).toFixed(2)}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-4 pt-3 border-t flex justify-between font-semibold">
-          <span>Total</span>
-          <span>NLe {(order.total_cents / 100).toFixed(2)}</span>
+
+        <div className="px-6 py-5">
+          <h3 className="text-xs uppercase tracking-wider font-medium text-neutral-500 mb-3">
+            Items
+          </h3>
+          <ul className="space-y-2 text-sm">
+            {items.map((i, idx) => (
+              <li key={idx} className="flex justify-between">
+                <span className="text-neutral-700">
+                  <span className="text-neutral-900 font-medium">{i.qty}×</span>{" "}
+                  {i.name}
+                </span>
+                <span className="tabular-nums text-neutral-900">
+                  NLe {((i.price_cents * i.qty) / 100).toFixed(2)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4 pt-3 border-t border-neutral-200 flex justify-between text-sm">
+            <span className="font-medium">Total</span>
+            <span className="font-semibold tabular-nums">
+              NLe {(order.total_cents / 100).toFixed(2)}
+            </span>
+          </div>
         </div>
-        <p className="text-xs text-gray-500 mt-4 text-center">
-          Show this code at pickup.
-        </p>
+
+        <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 text-center">
+          <p className="text-xs text-neutral-600">
+            Show this code at the kitchen counter.
+          </p>
+          <p className="text-[11px] text-neutral-400 mt-1">{order.phone}</p>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

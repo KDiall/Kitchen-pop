@@ -53,14 +53,11 @@ export async function POST(req: Request) {
     }))
   );
 
-  const checkout = await createCheckout({
-    amount: total,
-    phone: body.phone,
-    reference: order.reference,
-  });
-
+  // MOCK: skip Monime, go straight to ticket
+  // TODO: remove mock — replace with real createCheckout call when credentials are available
+  void createCheckout;
   return NextResponse.json({
     code: order.code,
-    redirect_url: checkout.redirect_url,
+    redirect_url: null,
   });
 }

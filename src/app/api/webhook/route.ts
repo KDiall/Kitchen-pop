@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const { error } = await db
     .from("orders")
     .update({ status: "paid" })
-    .eq("id", payload.data.id);
+    .eq("reference", payload.data.reference);
 
   if (error) {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
