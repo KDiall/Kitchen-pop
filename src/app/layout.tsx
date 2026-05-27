@@ -1,6 +1,7 @@
 import "./globals.css";
 import Link from "next/link";
 import { Instrument_Serif, Inter } from "next/font/google";
+import { CartBadge } from "@/components/CartBadge";
 
 const serif = Instrument_Serif({
   subsets: ["latin"],
@@ -45,9 +46,10 @@ export default function RootLayout({
             <nav className="flex items-center gap-1 text-sm">
               <Link
                 href="/"
-                className="px-3 py-1.5 rounded-md text-stone-600 hover:text-orange-700 hover:bg-orange-50 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-stone-600 hover:text-orange-700 hover:bg-orange-50 transition-colors"
               >
                 Menu
+                <CartBadge />
               </Link>
               <Link
                 href="/admin"

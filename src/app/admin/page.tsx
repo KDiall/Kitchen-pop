@@ -1,8 +1,24 @@
 import { db } from "@/lib/notifier";
+import { AdminMenuPanel } from "@/components/AdminMenuPanel";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: todayMenu } = await db
+    .from("menus")
+    .select("id, cutoff_at")
+    .eq("served_on", today)
+    .maybeSingle();
+
+  const { data: menuItems } = todayMenu
+    ? await db
+        .from("menu_items")
+        .select("id, name, price_cents, available")
+        .eq("menu_id", todayMenu.id)
+        .order("name")
+    : { data: [] };
+
   const { data: orders } = await db
     .from("orders")
     .select("id, code, phone, total_cents, status, created_at")
@@ -54,9 +70,15 @@ export default async function AdminPage() {
           Kitchen <span className="italic text-orange-700">dashboard</span>
         </h1>
         <p className="text-sm text-stone-500 mt-3">
-          Live view of paid orders. Refresh to update.
+          Manage today’s menu and view paid orders.
         </p>
       </div>
+
+      <AdminMenuPanel
+        initialMenuId={todayMenu?.id ?? null}
+        initialCutoffAt={todayMenu?.cutoff_at ?? null}
+        initialItems={menuItems ?? []}
+      />
 
       <div className="grid grid-cols-3 gap-px bg-stone-200/70 rounded-xl overflow-hidden border border-stone-200/70 mb-12 shadow-sm">
         <div className="bg-white p-5">
