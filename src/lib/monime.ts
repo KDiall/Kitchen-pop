@@ -10,45 +10,27 @@ const SPACE_ID = env("MONIME_SPACE_ID");
 const BASE = "https://api.monime.io";
 
 type CreateCheckoutInput = {
-  code: string;
   reference: string;
   phone: string;
-  items: { name: string; price_cents: number; qty: number }[];
-  baseUrl: string;
+  total_cents: number;
 };
 
 export async function createCheckout(input: CreateCheckoutInput) {
   if (!ACCESS_TOKEN || !SPACE_ID) {
     throw new Error("Monime credentials not configured");
   }
-  const idempotencyKey = crypto.randomUUID();
 
   const res = await fetch(`${BASE}/v1/checkout-sessions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${ACCESS_TOKEN}`,
       "Monime-Space-Id": SPACE_ID,
-      "Idempotency-Key": idempotencyKey,
-      "Monime-Version": "caph.2025-08-23",
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      name: "Pop-up Kitchen Order",
-      lineItems: input.items.map((i) => ({
-        name: i.name,
-        price: { currency: "SLE", value: i.price_cents },
-        type: "custom" as const,
-        quantity: i.qty,
-      })),
+      amount: { currency: "SLE", value: input.total_cents },
       reference: input.reference,
-      successUrl: `${input.baseUrl}/ticket/${input.code}`,
-      cancelUrl: input.baseUrl,
-      paymentOptions: {
-        momo: { disable: false },
-        card: { disable: true },
-        bank: { disable: true },
-        wallet: { disable: true },
-      },
+      customer: { phone: input.phone },
     }),
   });
 
@@ -57,22 +39,18 @@ export async function createCheckout(input: CreateCheckoutInput) {
     throw new Error(`monime ${res.status}: ${text}`);
   }
 
-  const body = await res.json() as Record<string, unknown>;
-
-  const result = (body?.result ?? body) as Record<string, unknown>;
-  const id = (result.id ?? body.id) as string;
+  const body = (await res.json()) as Record<string, unknown>;
   const redirect_url =
-    (result.redirect_url as string) ??
-    (result.redirectUrl as string) ??
     (body.redirect_url as string) ??
     (body.redirectUrl as string) ??
+    (body.url as string) ??
     "";
 
   if (!redirect_url) {
     console.error("[monime] no redirect_url in response", JSON.stringify(body));
   }
 
-  return { id, redirect_url };
+  return { redirect_url };
 }
 
 export function verifyWebhook(
