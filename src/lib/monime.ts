@@ -41,7 +41,6 @@ export async function createCheckout(input: CreateCheckoutInput) {
         quantity: i.qty,
       })),
       reference: input.reference,
-      customer: { phone: input.phone },
       successUrl: `${input.baseUrl}/ticket/${input.code}`,
       cancelUrl: input.baseUrl,
       paymentOptions: {
