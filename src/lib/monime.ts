@@ -81,22 +81,47 @@ export function verifyWebhook(
   signatureHeader: string
 ): boolean {
   const secret = process.env.MONIME_WEBHOOK_SECRET;
-  if (!secret || !signatureHeader) return false;
+  if (!secret) {
+    console.error("[verifyWebhook] MONIME_WEBHOOK_SECRET not set");
+    return false;
+  }
+  if (!signatureHeader) {
+    console.error("[verifyWebhook] missing signature header");
+    return false;
+  }
 
   const parts: Record<string, string> = {};
   for (const part of signatureHeader.split(",")) {
-    const [key, ...rest] = part.split("=");
-    parts[key] = rest.join("=");
+    const idx = part.indexOf("=");
+    if (idx === -1) continue;
+    const key = part.slice(0, idx).trim();
+    const val = part.slice(idx + 1);
+    parts[key] = val;
   }
+
+  console.error("[verifyWebhook] parsed header parts", JSON.stringify(parts));
 
   const timestamp = parts["t"];
   const receivedSig = parts["v1"];
-  if (!timestamp || !receivedSig) return false;
+  if (!timestamp) {
+    console.error("[verifyWebhook] missing timestamp");
+    return false;
+  }
+  if (!receivedSig) {
+    console.error("[verifyWebhook] missing v1 signature");
+    return false;
+  }
 
   const ts = parseInt(timestamp, 10);
-  if (Number.isNaN(ts)) return false;
+  if (Number.isNaN(ts)) {
+    console.error("[verifyWebhook] invalid timestamp", { timestamp });
+    return false;
+  }
   const age = Math.floor(Date.now() / 1000) - ts;
-  if (age > 5 * 60 || age < -60) return false;
+  if (age > 5 * 60 || age < -60) {
+    console.error("[verifyWebhook] timestamp out of range", { ts, age });
+    return false;
+  }
 
   const expectedB64 = crypto
     .createHmac("sha256", secret)
@@ -106,9 +131,13 @@ export function verifyWebhook(
   try {
     const a = Buffer.from(receivedSig, "base64");
     const b = Buffer.from(expectedB64, "base64");
-    if (a.length !== b.length) return false;
+    if (a.length !== b.length) {
+      console.error("[verifyWebhook] signature length mismatch");
+      return false;
+    }
     return crypto.timingSafeEqual(a, b);
-  } catch {
+  } catch (err) {
+    console.error("[verifyWebhook] base64 decode error", err);
     return false;
   }
 }

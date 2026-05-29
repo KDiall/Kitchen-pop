@@ -4,11 +4,23 @@ import { verifyWebhook } from "@/lib/monime";
 
 export async function POST(req: Request) {
   const raw = await req.text();
-  const signature = req.headers.get("monime-signature") ?? "";
+  const signature =
+    req.headers.get("monime-signature") ??
+    req.headers.get("x-monime-signature") ??
+    "";
+
+  if (!signature) {
+    const all: Record<string, string> = {};
+    req.headers.forEach((v, k) => { all[k] = v; });
+    console.error("[webhook] no signature header found", all);
+  }
 
   const ok = verifyWebhook(raw, signature);
   if (!ok) {
-    console.error("[webhook] bad signature", { signature: signature.slice(0, 20) });
+    console.error("[webhook] bad signature", {
+      signature: signature.slice(0, 60),
+      hasSecret: !!process.env.MONIME_WEBHOOK_SECRET,
+    });
     return NextResponse.json({ error: "Bad signature" }, { status: 401 });
   }
 
