@@ -1,6 +1,7 @@
 import { db } from "@/lib/notifier";
 import { AdminMenuPanel } from "@/components/AdminMenuPanel";
 import { AdminOrdersPanel } from "@/components/AdminOrdersPanel";
+import { AdminOrderLookup } from "@/components/AdminOrderLookup";
 
 export const dynamic = "force-dynamic";
 
@@ -77,6 +78,8 @@ export default async function AdminPage() {
         initialCutoffAt={todayMenu?.cutoff_at ?? null}
         initialItems={menuItems ?? []}
       />
+
+      <AdminOrderLookup />
 
       <AdminOrdersPanel
         orders={allOrders ?? []}
