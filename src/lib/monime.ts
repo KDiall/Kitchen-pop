@@ -10,9 +10,10 @@ const SPACE_ID = env("MONIME_SPACE_ID");
 const BASE = "https://api.monime.io";
 
 type CreateCheckoutInput = {
+  code: string;
   reference: string;
-  phone: string;
-  total_cents: number;
+  items: { name: string; price_cents: number; qty: number }[];
+  baseUrl: string;
 };
 
 export async function createCheckout(input: CreateCheckoutInput) {
@@ -31,9 +32,22 @@ export async function createCheckout(input: CreateCheckoutInput) {
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      amount: { currency: "SLE", value: input.total_cents },
+      name: "Pop-up Kitchen Order",
+      lineItems: input.items.map((i) => ({
+        name: i.name,
+        price: { currency: "SLE", value: i.price_cents },
+        type: "custom",
+        quantity: i.qty,
+      })),
       reference: input.reference,
-      customer: { phone: input.phone },
+      successUrl: `${input.baseUrl}/ticket/${input.code}`,
+      cancelUrl: input.baseUrl,
+      paymentOptions: {
+        momo: { disable: false },
+        card: { disable: true },
+        bank: { disable: true },
+        wallet: { disable: true },
+      },
     }),
   });
 
@@ -43,10 +57,13 @@ export async function createCheckout(input: CreateCheckoutInput) {
   }
 
   const body = (await res.json()) as Record<string, unknown>;
+
+  const result = (body?.result ?? body) as Record<string, unknown>;
   const redirect_url =
+    (result.redirect_url as string) ??
+    (result.redirectUrl as string) ??
     (body.redirect_url as string) ??
     (body.redirectUrl as string) ??
-    (body.url as string) ??
     "";
 
   if (!redirect_url) {

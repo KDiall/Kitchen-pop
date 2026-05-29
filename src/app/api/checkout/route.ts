@@ -53,12 +53,15 @@ export async function POST(req: Request) {
     }))
   );
 
+  const url = new URL(req.url);
+
   let redirect_url: string | null = null;
   try {
     const monime = await createCheckout({
+      code: order.code,
       reference,
-      phone: body.phone,
-      total_cents: total,
+      items: body.items,
+      baseUrl: `${url.protocol}//${url.host}`,
     });
     redirect_url = monime.redirect_url;
   } catch (err) {
