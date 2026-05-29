@@ -4,6 +4,7 @@ import { useState } from "react";
 
 type Item = { name: string; qty: number; price_cents: number };
 type Order = {
+  id: string;
   code: string;
   phone: string;
   total_cents: number;
@@ -28,6 +29,7 @@ export function AdminOrderLookup() {
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [delivering, setDelivering] = useState(false);
 
   async function lookup(e: React.FormEvent) {
     e.preventDefault();
@@ -49,6 +51,21 @@ export function AdminOrderLookup() {
       setError("Request failed");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function markDelivered() {
+    if (!order || order.status !== "paid") return;
+    setDelivering(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/status`, {
+        method: "PATCH",
+      });
+      if (res.ok) {
+        setOrder({ ...order, status: "delivered" });
+      }
+    } finally {
+      setDelivering(false);
     }
   }
 
@@ -102,6 +119,20 @@ export function AdminOrderLookup() {
               >
                 {order.status}
               </span>
+              {order.status === "paid" && (
+                <button
+                  disabled={delivering}
+                  onClick={markDelivered}
+                  className="text-[10px] uppercase tracking-[0.12em] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md transition-colors disabled:opacity-40"
+                >
+                  {delivering ? "…" : "✓ Delivered"}
+                </button>
+              )}
+              {order.status === "delivered" && (
+                <span className="text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                  ✔ Done
+                </span>
+              )}
             </div>
 
             <div className="text-xs text-stone-500 mb-4 space-y-1">
