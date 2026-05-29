@@ -20,11 +20,14 @@ export async function createCheckout(input: CreateCheckoutInput) {
     throw new Error("Monime credentials not configured");
   }
 
+  const idempotencyKey = crypto.randomUUID();
+
   const res = await fetch(`${BASE}/v1/checkout-sessions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${ACCESS_TOKEN}`,
       "Monime-Space-Id": SPACE_ID,
+      "Idempotency-Key": idempotencyKey,
       "content-type": "application/json",
     },
     body: JSON.stringify({
