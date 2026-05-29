@@ -12,6 +12,7 @@ create table if not exists menu_items (
   available boolean not null default true
 );
 
+-- status: pending → paid → delivered
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
   code text not null unique,
