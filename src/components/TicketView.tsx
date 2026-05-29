@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+
 type Order = {
   code: string;
   phone: string;
@@ -13,12 +17,33 @@ type Item = {
 };
 
 export function TicketView({
-  order,
+  order: initial,
   items,
 }: {
   order: Order;
   items: Item[];
 }) {
+  const [order, setOrder] = useState(initial);
+
+  const poll = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/ticket/${order.code}/status`);
+      const data = await res.json();
+      if (data.status === "paid") {
+        setOrder((prev) => ({ ...prev, status: "paid" }));
+      }
+    } catch {
+      // ignore
+    }
+  }, [order.code]);
+
+  useEffect(() => {
+    if (order.status !== "paid") {
+      const id = setInterval(poll, 3000);
+      return () => clearInterval(id);
+    }
+  }, [order.status, poll]);
+
   const isPaid = order.status === "paid";
 
   return (

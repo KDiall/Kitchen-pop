@@ -19,19 +19,19 @@ export default async function AdminPage() {
         .order("name")
     : { data: [] };
 
-  const { data: orders } = await db
+  const { data: allOrders } = await db
     .from("orders")
     .select("id, code, phone, total_cents, status, created_at")
-    .eq("status", "paid")
     .order("created_at", { ascending: false });
 
-  const orderIds = (orders ?? []).map((o) => o.id);
+  const paidOrders = (allOrders ?? []).filter((o) => o.status === "paid");
+  const paidIds = paidOrders.map((o) => o.id);
 
-  const itemsResult = orderIds.length
+  const itemsResult = paidIds.length
     ? await db
         .from("order_items")
         .select("order_id, name, qty")
-        .in("order_id", orderIds)
+        .in("order_id", paidIds)
     : { data: [] };
 
   const items = itemsResult.data ?? [];
@@ -45,7 +45,7 @@ export default async function AdminPage() {
     (a, b) => b[1] - a[1]
   );
 
-  const totalRevenue = (orders ?? []).reduce(
+  const totalRevenue = paidOrders.reduce(
     (s, o) => s + o.total_cents,
     0
   );
@@ -86,7 +86,7 @@ export default async function AdminPage() {
             Orders
           </p>
           <p className="font-serif text-5xl mt-1.5 tabular-nums text-stone-900">
-            {(orders ?? []).length}
+            {(allOrders ?? []).length}
           </p>
         </div>
         <div className="bg-white p-5">
@@ -140,27 +140,30 @@ export default async function AdminPage() {
 
       <section>
         <div className="flex items-baseline justify-between mb-4">
-          <h2 className="font-serif text-2xl text-stone-900">Paid orders</h2>
+          <h2 className="font-serif text-2xl text-stone-900">All orders</h2>
           <span className="text-[11px] uppercase tracking-[0.15em] text-stone-400">
             Most recent first
           </span>
         </div>
-        {(orders ?? []).length === 0 ? (
+        {(allOrders ?? []).length === 0 ? (
           <div className="border border-stone-200/80 rounded-xl p-10 text-center text-sm text-stone-500 bg-white">
             Nothing yet.
           </div>
         ) : (
           <ul className="bg-white border border-stone-200/80 rounded-xl divide-y divide-stone-100 overflow-hidden shadow-sm">
-            {(orders ?? []).map((o) => (
+            {(allOrders ?? []).map((o) => (
               <li
                 key={o.id}
-                className="grid grid-cols-[auto_1fr_auto] items-center gap-4 px-5 py-3.5 hover:bg-emerald-50/40 transition-colors"
+                className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 px-5 py-3.5 hover:bg-stone-50/40 transition-colors"
               >
-                <span className="font-serif text-xl tracking-[0.1em] text-emerald-700">
+                <span className={`font-serif text-xl tracking-[0.1em] ${o.status === "paid" ? "text-emerald-700" : "text-amber-600"}`}>
                   {o.code}
                 </span>
                 <span className="text-stone-500 text-xs tabular-nums">
                   {o.phone}
+                </span>
+                <span className={`text-[10px] uppercase tracking-wider font-semibold ${o.status === "paid" ? "text-emerald-600" : "text-amber-600"}`}>
+                  {o.status}
                 </span>
                 <span className="tabular-nums text-sm font-medium text-stone-900">
                   <span className="text-xs text-emerald-700 mr-1 font-semibold">NLe</span>

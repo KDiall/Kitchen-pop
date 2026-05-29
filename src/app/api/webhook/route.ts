@@ -6,22 +6,36 @@ export async function POST(req: Request) {
   const raw = await req.text();
   const signature = req.headers.get("monime-signature") ?? "";
 
-  if (!verifyWebhook(raw, signature)) {
+  const ok = verifyWebhook(raw, signature);
+  if (!ok) {
+    console.error("[webhook] bad signature", { signature: signature.slice(0, 20) });
     return NextResponse.json({ error: "Bad signature" }, { status: 401 });
   }
 
   const payload = JSON.parse(raw);
+  const eventName =
+    typeof payload.event === "string"
+      ? payload.event
+      : payload.event?.name;
 
-  if (payload.event !== "payment.succeeded") {
+  if (eventName !== "checkout_session.completed" && eventName !== "payment.succeeded") {
+    console.error("[webhook] unhandled event", { eventName });
     return NextResponse.json({ ok: true });
+  }
+
+  const reference = payload.data?.reference;
+  if (!reference) {
+    console.error("[webhook] missing reference");
+    return NextResponse.json({ error: "Missing reference" }, { status: 400 });
   }
 
   const { error } = await db
     .from("orders")
     .update({ status: "paid" })
-    .eq("reference", payload.data.reference);
+    .eq("reference", reference);
 
   if (error) {
+    console.error("[webhook] db update failed", { reference, error });
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { db } from "@/lib/notifier";
-import { createCheckout } from "@/lib/monime";
 import { generateCode } from "@/lib/codes";
+import { createCheckout } from "@/lib/monime";
 
 type Body = {
   phone: string;
@@ -53,11 +53,27 @@ export async function POST(req: Request) {
     }))
   );
 
-  // MOCK: skip Monime, go straight to ticket
-  // TODO: remove mock — replace with real createCheckout call when credentials are available
-  void createCheckout;
+  const url = new URL(req.url);
+
+  let redirect_url: string | null = null;
+  try {
+    const monime = await createCheckout({
+      code: order.code,
+      reference,
+      phone: body.phone,
+      items: body.items,
+      baseUrl: `${url.protocol}//${url.host}`,
+    });
+    redirect_url = monime.redirect_url;
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Payment initiation failed" },
+      { status: 502 }
+    );
+  }
+
   return NextResponse.json({
     code: order.code,
-    redirect_url: null,
+    redirect_url,
   });
 }
