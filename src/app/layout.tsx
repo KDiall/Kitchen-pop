@@ -2,6 +2,7 @@ import "./globals.css";
 import Link from "next/link";
 import { Instrument_Serif, Inter } from "next/font/google";
 import { CartBadge } from "@/components/CartBadge";
+import { Logo } from "@/components/Logo";
 
 const serif = Instrument_Serif({
   subsets: ["latin"],
@@ -17,9 +18,9 @@ const sans = Inter({
 });
 
 export const metadata = {
-  title: "Pop-up Kitchen — Sierra Leone",
+  title: "Pop-up Kitchen — World Flavours",
   description:
-    "Today's freshly cooked Sierra Leonean dishes. Order before cutoff, pay by mobile money, pick up hot.",
+    "Today's freshly cooked dishes from around the world. Order before cutoff, pay by mobile money, pick up hot.",
 };
 
 export default function RootLayout({
@@ -32,17 +33,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col text-zinc-900 font-sans">
         <header className="sticky top-0 z-20 bg-[#fbfaf7]/85 backdrop-blur-md border-b border-stone-200/70">
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <Link
-              href="/"
-              className="flex items-baseline gap-2 group"
-            >
-              <span className="font-serif text-2xl tracking-tight text-stone-900 italic">
-                Pop-up
-              </span>
-              <span className="text-[11px] uppercase tracking-[0.22em] text-orange-700 font-semibold">
-                Kitchen
-              </span>
-            </Link>
+            <Logo />
             <nav className="flex items-center gap-1 text-sm">
               <Link
                 href="/"

@@ -21,7 +21,12 @@ export function Cart() {
 
   if (items.length === 0) {
     return (
-      <aside className="bg-white rounded-xl p-6 border border-stone-200/80 sticky top-24 h-fit">
+      <aside
+        className="bg-white rounded-xl p-6 border border-stone-200/80 sticky top-24 h-fit"
+        style={{
+          animation: "fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both",
+        }}
+      >
         <div className="flex items-center justify-between">
           <h2 className="font-serif text-xl text-stone-900">Your order</h2>
           <span className="text-[11px] uppercase tracking-wider text-stone-400">
@@ -36,7 +41,12 @@ export function Cart() {
   }
 
   return (
-    <aside className="bg-white rounded-xl border border-stone-200/80 sticky top-24 h-fit overflow-hidden shadow-sm">
+    <aside
+      className="bg-white rounded-xl border border-stone-200/80 sticky top-24 h-fit overflow-hidden shadow-sm"
+      style={{
+        animation: "slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both",
+      }}
+    >
       <div className="px-6 pt-6 pb-4 flex items-center justify-between">
         <h2 className="font-serif text-xl text-stone-900">Your order</h2>
         <span className="text-[11px] uppercase tracking-wider text-orange-700 font-semibold tabular-nums">
@@ -44,10 +54,13 @@ export function Cart() {
         </span>
       </div>
       <ul className="px-6 divide-y divide-stone-100">
-        {items.map((i) => (
+        {items.map((i, idx) => (
           <li
             key={i.id}
             className="py-3 flex items-center justify-between gap-3"
+            style={{
+              animation: `slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) ${0.2 + idx * 0.05}s both`,
+            }}
           >
             <div className="flex-1 min-w-0">
               <p className="truncate text-sm text-stone-900 leading-snug">
@@ -91,10 +104,10 @@ export function Cart() {
         </div>
         <button
           onClick={() => router.push("/checkout")}
-          className="w-full bg-orange-700 hover:bg-orange-800 text-white rounded-md py-2.5 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+          className="w-full bg-orange-700 hover:bg-orange-800 text-white rounded-md py-2.5 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm hover:shadow-[0_4px_12px_-4px_rgba(194,65,12,0.3)] active:scale-[0.98]"
         >
           Continue to checkout
-          <span aria-hidden>→</span>
+          <span aria-hidden className="group-hover:translate-x-0.5 transition-transform">→</span>
         </button>
       </div>
     </aside>

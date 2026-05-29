@@ -24,6 +24,8 @@ export function TicketView({
   items: Item[];
 }) {
   const [order, setOrder] = useState(initial);
+  const [retrying, setRetrying] = useState(false);
+  const [showRetry, setShowRetry] = useState(false);
 
   const poll = useCallback(async () => {
     try {
@@ -44,7 +46,37 @@ export function TicketView({
     }
   }, [order.status, poll]);
 
+  useEffect(() => {
+    if (order.status !== "paid") {
+      const created = new Date(order.created_at).getTime();
+      const elapsed = Date.now() - created;
+      if (elapsed >= 240_000) {
+        setShowRetry(true);
+      } else {
+        const remaining = 240_000 - elapsed;
+        const id = setTimeout(() => setShowRetry(true), remaining);
+        return () => clearTimeout(id);
+      }
+    }
+  }, [order.status, order.created_at]);
+
   const isPaid = order.status === "paid";
+
+  const handleRetry = async () => {
+    setRetrying(true);
+    try {
+      const res = await fetch(`/api/ticket/${order.code}/retry`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data.redirect_url) {
+        window.location.href = data.redirect_url;
+      }
+    } catch {
+      // ignore
+    }
+    setRetrying(false);
+  };
 
   return (
     <div className="max-w-lg mx-auto px-6 py-12">
@@ -132,6 +164,21 @@ export function TicketView({
           </span>
         </div>
       </div>
+
+      {showRetry && !isPaid && (
+        <div className="mt-6 text-center">
+          <p className="text-sm text-amber-700 mb-3">
+            Payment session expired. Generate a new link to try again.
+          </p>
+          <button
+            onClick={handleRetry}
+            disabled={retrying}
+            className="inline-flex items-center gap-1.5 text-sm rounded-md px-5 py-2.5 font-medium bg-orange-700 text-white hover:bg-orange-800 shadow-sm transition-all disabled:opacity-60"
+          >
+            {retrying ? "Generating…" : "Generate new code"}
+          </button>
+        </div>
+      )}
 
       <p className="text-[11px] text-stone-400 text-center mt-6 tabular-nums">
         {order.phone} ·{" "}
